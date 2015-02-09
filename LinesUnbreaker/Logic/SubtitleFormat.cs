@@ -72,10 +72,6 @@ namespace Nikse.SubtitleEdit.PluginLogic
 
         abstract internal void LoadSubtitle(Subtitle subtitle, List<string> lines, string fileName);
 
-        internal virtual void RemoveNativeFormatting(Subtitle subtitle)
-        {
-        }
-
         abstract internal string ToText(Subtitle subtitle, string title);
     }
 }

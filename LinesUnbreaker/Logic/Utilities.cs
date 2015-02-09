@@ -18,19 +18,20 @@ namespace Nikse.SubtitleEdit.PluginLogic
         public static bool IsInteger(string s)
         {
             int i;
-            if (int.TryParse(s, out i))
-                return true;
-            return false;
+            return int.TryParse(s, out i);
         }
 
         public static string RemoveHtmlFontTag(string s)
         {
             s = Regex.Replace(s, "(?i)</?font>", string.Empty);
-            while (s.ToLower().Contains("<font"))
+            var idx = s.IndexOf("<font", StringComparison.OrdinalIgnoreCase);
+            while (idx >= 0)
             {
-                int startIndex = s.ToLower().IndexOf("<font");
-                int endIndex = Math.Max(s.IndexOf(">"), startIndex + 4);
-                s = s.Remove(startIndex, (endIndex - startIndex) + 1);
+                var endIdx = s.IndexOf('>', 5);
+                if (endIdx < 5)
+                    break;
+                s = s.Remove(idx, endIdx - idx + 1);
+                idx = s.IndexOf("<font", StringComparison.OrdinalIgnoreCase);
             }
             return s;
         }
@@ -54,13 +55,31 @@ namespace Nikse.SubtitleEdit.PluginLogic
         internal static string RemoveParagraphTag(string s)
         {
             s = Regex.Replace(s, "(?i)</?p>", string.Empty);
-            while (s.ToLower().Contains("<p "))
+            var idx = s.IndexOf("<p", StringComparison.Ordinal);
+            while (idx >= 0)
             {
-                int startIndex = s.ToLower().IndexOf("<p ");
-                int endIndex = Math.Max(s.IndexOf(">"), startIndex + 4);
-                s = s.Remove(startIndex, (endIndex - startIndex) + 1);
+                var endIdx = s.IndexOf('>', 2);
+                if (endIdx < idx)
+                    break;
+                s = s.Remove(idx, endIdx - idx + 1);
+                idx = s.IndexOf("<p", StringComparison.Ordinal);
             }
             return s;
+        }
+
+        public static bool IsDialog(string text)
+        {
+            return false;
+        }
+
+        public static bool IsMood(string text)
+        {
+            return false;
+        }
+
+        public static bool IsNarrator(string text)
+        {
+            return false;
         }
     }
 }

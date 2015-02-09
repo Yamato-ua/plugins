@@ -69,11 +69,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
                             new XElement("SkipNarrator", true),
                             new XElement("SkipMoods", false)
                             );
-                        try
-                        {
-                            _xmlSetting.Save(path);
-                        }
-                        catch { }
+                        _xmlSetting.Save(path);
                     }
                 }
                 else
@@ -84,11 +80,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
                     _xmlSetting.Element("SkipMoods").Value = checkBoxMoods.Checked.ToString();
                     _xmlSetting.Element("SkipNarrator").Value = checkBoxSkipNarrator.Checked.ToString();
                     _xmlSetting.Element("SkipDialog").Value = checkBoxSkipDialog.Checked.ToString();
-                    try
-                    {
-                        _xmlSetting.Save(path);
-                    }
-                    catch { }
+                    _xmlSetting.Save(path);
                 }
             }
             catch (Exception ex)
@@ -189,9 +181,11 @@ namespace Nikse.SubtitleEdit.PluginLogic
         private string UnbreakLines(string s)
         {
             var temp = Utilities.RemoveHtmlTags(s);
+            temp = temp.Replace("♪", string.Empty).Replace("♫", string.Empty);
             temp = temp.Replace("  ", " ").Trim();
 
-            if ((temp.StartsWith("-") || temp.Contains("\r\n-")) && checkBoxSkipDialog.Checked)
+            // TODO: move these methods in Utilities's helper method
+            if ((temp.StartsWith("-", StringComparison.Ordinal) || temp.Contains("\r\n-")) && checkBoxSkipDialog.Checked)
             {
                 return s;
             }
