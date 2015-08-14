@@ -7,8 +7,8 @@ namespace Nikse.SubtitleEdit.PluginLogic
 {
     public class SubRip : SubtitleFormat
     {
-        private static Regex _regexTimeCodes = new Regex(@"^-?\d+:-?\d+:-?\d+[:,]-?\d+\s*-->\s*-?\d+:-?\d+:-?\d+[:,]-?\d+$", RegexOptions.Compiled);
-        private static Regex _regexTimeCodes2 = new Regex(@"^\d+:\d+:\d+,\d+\s*-->\s*\d+:\d+:\d+,\d+$", RegexOptions.Compiled);
+        private static readonly Regex RegexTimeCodes = new Regex(@"^-?\d+:-?\d+:-?\d+[:,]-?\d+\s*-->\s*-?\d+:-?\d+:-?\d+[:,]-?\d+$", RegexOptions.Compiled);
+        private static readonly Regex RegexTimeCodes2 = new Regex(@"^\d+:\d+:\d+,\d+\s*-->\s*\d+:\d+:\d+,\d+$", RegexOptions.Compiled);
         private ExpectingLine _expecting = ExpectingLine.Number;
         private int _lineNumber;
         private Paragraph _paragraph;
@@ -75,12 +75,12 @@ namespace Nikse.SubtitleEdit.PluginLogic
                 // A new line is missing between two paragraphs (buggy srt file)
                 if (_expecting == ExpectingLine.Text && i + 1 < lines.Count &&
                     _paragraph != null && !string.IsNullOrEmpty(_paragraph.Text) && Utilities.IsInteger(line) &&
-                    _regexTimeCodes.IsMatch(lines[i + 1]))
+                    RegexTimeCodes.IsMatch(lines[i + 1]))
                 {
                     _errorCount++;
                     ReadLine(subtitle, string.Empty, string.Empty);
                 }
-                if (_expecting == ExpectingLine.Number && _regexTimeCodes.IsMatch(line))
+                if (_expecting == ExpectingLine.Number && RegexTimeCodes.IsMatch(line))
                 {
                     _errorCount++;
                     _expecting = ExpectingLine.TimeCodes;
@@ -123,12 +123,8 @@ namespace Nikse.SubtitleEdit.PluginLogic
 
         private bool IsText(string text)
         {
-            if (text.Trim().Length == 0)
+            if (string.IsNullOrWhiteSpace(text) || Utilities.IsInteger(text) || RegexTimeCodes.IsMatch(text))
                 return false;
-
-            if (Utilities.IsInteger(text) || _regexTimeCodes.IsMatch(text))
-                return false;
-
             return true;
         }
 
@@ -177,7 +173,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
                     else if (string.IsNullOrEmpty(line) && string.IsNullOrEmpty(_paragraph.Text))
                     {
                         _paragraph.Text = string.Empty;
-                        if (!string.IsNullOrEmpty(next) && (Utilities.IsInteger(next) || _regexTimeCodes.IsMatch(next)))
+                        if (!string.IsNullOrEmpty(next) && (Utilities.IsInteger(next) || RegexTimeCodes.IsMatch(next)))
                         {
                             subtitle.Paragraphs.Add(_paragraph);
                             _paragraph = new Paragraph();
@@ -196,23 +192,24 @@ namespace Nikse.SubtitleEdit.PluginLogic
 
         private string RemoveBadChars(string line)
         {
-            return line.Replace("\0", " ");
+            return line.Replace('\0', ' ');
         }
 
         private bool TryReadTimeCodesLine(string line, Paragraph paragraph)
         {
-            line = line.Replace("،", ",");
-            line = line.Replace("", ",");
-            line = line.Replace("¡", ",");
+            line = line.Replace('،', ',');
+            line = line.Replace('', ',');
+            line = line.Replace('¡', ',');
 
+            const string separator = " --> ";
             // Fix some badly formatted separator sequences - anything can happen if you manually edit ;)
-            line = line.Replace(" -> ", " --> "); // I've seen this
-            line = line.Replace(" - > ", " --> ");
-            line = line.Replace(" ->> ", " --> ");
-            line = line.Replace(" -- > ", " --> ");
-            line = line.Replace(" - -> ", " --> ");
-            line = line.Replace(" -->> ", " --> ");
-            line = line.Replace(" ---> ", " --> ");
+            line = line.Replace(" -> ", separator); // I've seen this
+            line = line.Replace(" - > ", separator);
+            line = line.Replace(" ->> ", separator);
+            line = line.Replace(" -- > ", separator);
+            line = line.Replace(" - -> ", separator);
+            line = line.Replace(" -->> ", separator);
+            line = line.Replace(" ---> ", separator);
 
             // Removed stuff after timecodes - like subtitle position
             // - example of position info: 00:02:26,407 --> 00:02:31,356  X1:100 X2:100 Y1:100 Y2:100
@@ -220,7 +217,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
                 line = line.Substring(0, 29);
 
             // removes all extra spaces
-            line = line.Replace(" ", string.Empty).Replace("-->", " --> ");
+            line = line.Replace(" ", string.Empty).Replace("-->", separator);
             line = line.Trim();
 
             // Fix a few more cases of wrong time codes, seen this: 00.00.02,000 --> 00.00.04,000
@@ -230,7 +227,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
             if (line.Length >= 29 && line.Length <= 30 && ":;".Contains(line[25].ToString()))
                 line = line.Substring(0, 25) + ',' + line.Substring(25 + 1);
 
-            if (_regexTimeCodes.IsMatch(line) || _regexTimeCodes2.IsMatch(line))
+            if (RegexTimeCodes.IsMatch(line) || RegexTimeCodes2.IsMatch(line))
             {
                 string[] parts = line.Replace("-->", ":").Replace(" ", string.Empty).Split(':', ',');
                 try
