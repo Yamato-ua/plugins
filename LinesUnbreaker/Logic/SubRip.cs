@@ -66,9 +66,9 @@ namespace Nikse.SubtitleEdit.PluginLogic
             {
                 _lineNumber++;
                 string line = lines[i].TrimEnd();
-                line = line.Trim(Convert.ToChar(127)); // 127=delete acscii
+                line = line.Trim('\u007F'); // 127=delete acscii
 
-                string next = string.Empty;
+                var next = string.Empty;
                 if (i + 1 < lines.Count)
                     next = lines[i + 1];
 
@@ -95,9 +95,6 @@ namespace Nikse.SubtitleEdit.PluginLogic
             foreach (Paragraph p in subtitle.Paragraphs)
             {
                 p.Text = p.Text.Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
-                //if (Regex.IsMatch(p.Text, Utilities.REGEXHEARINGIMPAIRED))
-                //    p.HearingImpaired = true;
-                //p.GetHearingImpairedText(Paragraph.HearingImpairedType.FeelingsAndMoods);
             }
 
             if (_errorCount < 100)
@@ -113,10 +110,10 @@ namespace Nikse.SubtitleEdit.PluginLogic
             var sb = new StringBuilder();
             foreach (Paragraph p in subtitle.Paragraphs)
             {
-                string s = p.Text
+                var s = p.Text
                     .Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine)
                     .Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
-                sb.Append(string.Format(paragraphWriteFormat, p.Number, p.StartTime, p.EndTime, s));
+                sb.AppendFormat(paragraphWriteFormat, p.Number, p.StartTime, p.EndTime, s);
             }
             return sb.ToString().Trim();
         }
@@ -232,11 +229,13 @@ namespace Nikse.SubtitleEdit.PluginLogic
                 string[] parts = line.Replace("-->", ":").Replace(" ", string.Empty).Split(':', ',');
                 try
                 {
+                    // Start time
                     int startHours = int.Parse(parts[0]);
                     int startMinutes = int.Parse(parts[1]);
                     int startSeconds = int.Parse(parts[2]);
                     int startMilliseconds = int.Parse(parts[3]);
 
+                    // End time
                     int endHours = int.Parse(parts[4]);
                     int endMinutes = int.Parse(parts[5]);
                     int endSeconds = int.Parse(parts[6]);
