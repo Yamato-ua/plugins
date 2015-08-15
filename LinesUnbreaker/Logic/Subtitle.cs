@@ -5,18 +5,18 @@ using System.Linq;
 
 namespace Nikse.SubtitleEdit.PluginLogic
 {
-    public class Subtitle
+    internal class Subtitle
     {
         private List<Paragraph> _paragraphs;
         private SubtitleFormat _format;
         private bool _wasLoadedWithFrameNumbers;
-        internal string Header { get; set; }
-        internal string Footer { get; set; }
-        internal string FileName { get; set; }
-        internal bool IsHearingImpaired { get; private set; }
-        internal const int MaximumHistoryItems = 100;
+        public string Header { get; set; }
+        public string Footer { get; set; }
+        public string FileName { get; set; }
+        public bool IsHearingImpaired { get; private set; }
+        public const int MaximumHistoryItems = 100;
 
-        internal SubtitleFormat OriginalFormat
+        public SubtitleFormat OriginalFormat
         {
             get
             {
@@ -24,7 +24,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
             }
         }
 
-        internal Subtitle()
+        public Subtitle()
         {
             _paragraphs = new List<Paragraph>();
             FileName = "Untitled";
@@ -35,7 +35,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
         /// Copy constructor (only paragraphs)
         /// </summary>
         /// <param name="subtitle">Subtitle to copy</param>
-        internal Subtitle(Subtitle subtitle)
+        public Subtitle(Subtitle subtitle)
             : this()
         {
             foreach (Paragraph p in subtitle.Paragraphs)
@@ -45,7 +45,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
             _wasLoadedWithFrameNumbers = subtitle.WasLoadedWithFrameNumbers;
         }
 
-        internal List<Paragraph> Paragraphs
+        public List<Paragraph> Paragraphs
         {
             get
             {
@@ -53,19 +53,19 @@ namespace Nikse.SubtitleEdit.PluginLogic
             }
         }
 
-        internal Paragraph GetParagraphOrDefault(int index)
+        public Paragraph GetParagraphOrDefault(int index)
         {
             if (_paragraphs == null || _paragraphs.Count <= index || index < 0)
                 return null;
             return _paragraphs[index];
         }
 
-        internal string ToText(SubtitleFormat format)
+        public string ToText(SubtitleFormat format)
         {
             return format.ToText(this, Path.GetFileNameWithoutExtension(FileName));
         }
 
-        internal void AddTimeToAllParagraphs(TimeSpan time)
+        public void AddTimeToAllParagraphs(TimeSpan time)
         {
             foreach (Paragraph p in Paragraphs)
             {
@@ -79,7 +79,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
         /// </summary>
         /// <param name="frameRate">Number of frames per second</param>
         /// <returns>True if times could be calculated</returns>
-        internal bool CalculateTimeCodesFromFrameNumbers(double frameRate)
+        public bool CalculateTimeCodesFromFrameNumbers(double frameRate)
         {
             if (_format == null)
                 return false;
@@ -99,7 +99,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
         /// </summary>
         /// <param name="frameRate"></param>
         /// <returns></returns>
-        internal bool CalculateFrameNumbersFromTimeCodes(double frameRate)
+        public bool CalculateFrameNumbersFromTimeCodes(double frameRate)
         {
             if (_format == null)
                 return false;
@@ -117,7 +117,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
             return true;
         }
 
-        internal void CalculateFrameNumbersFromTimeCodesNoCheck(double frameRate)
+        public void CalculateFrameNumbersFromTimeCodesNoCheck(double frameRate)
         {
             foreach (Paragraph p in Paragraphs)
                 p.CalculateFrameNumbersFromTimeCodes(frameRate);
@@ -136,19 +136,19 @@ namespace Nikse.SubtitleEdit.PluginLogic
             }
         }
 
-        internal void ChangeFramerate(double oldFramerate, double newFramerate)
+        public void ChangeFramerate(double oldFramerate, double newFramerate)
         {
             foreach (Paragraph p in Paragraphs)
             {
-                double startFrame = p.StartTime.TotalMilliseconds / 1000.0 * oldFramerate;
-                double endFrame = p.EndTime.TotalMilliseconds / 1000.0 * oldFramerate;
-                p.StartTime.TotalMilliseconds = startFrame * (1000.0 / newFramerate);
-                p.EndTime.TotalMilliseconds = endFrame * (1000.0 / newFramerate);
+                double startFrame = p.StartTime.TotalMilliseconds / TimeCode.BaseUnit * oldFramerate;
+                double endFrame = p.EndTime.TotalMilliseconds / TimeCode.BaseUnit * oldFramerate;
+                p.StartTime.TotalMilliseconds = startFrame * (TimeCode.BaseUnit / newFramerate);
+                p.EndTime.TotalMilliseconds = endFrame * (TimeCode.BaseUnit / newFramerate);
                 p.CalculateFrameNumbersFromTimeCodes(newFramerate);
             }
         }
 
-        internal bool WasLoadedWithFrameNumbers
+        public bool WasLoadedWithFrameNumbers
         {
             get
             {
@@ -160,13 +160,13 @@ namespace Nikse.SubtitleEdit.PluginLogic
             }
         }
 
-        internal void AdjustDisplayTimeUsingPercent(double percent, System.Windows.Forms.ListView.SelectedIndexCollection selectedIndexes)
+        public void AdjustDisplayTimeUsingPercent(double percent, System.Windows.Forms.ListView.SelectedIndexCollection selectedIndexes)
         {
             for (int i = 0; i < _paragraphs.Count; i++)
             {
                 if (selectedIndexes == null || selectedIndexes.Contains(i))
                 {
-                    double nextStartMilliseconds = _paragraphs[_paragraphs.Count - 1].EndTime.TotalMilliseconds + 100000;
+                    double nextStartMilliseconds = _paragraphs[_paragraphs.Count - 1].EndTime.TotalMilliseconds + TimeCode.BaseUnit;
                     if (i + 1 < _paragraphs.Count)
                         nextStartMilliseconds = _paragraphs[i + 1].StartTime.TotalMilliseconds;
 
@@ -179,17 +179,17 @@ namespace Nikse.SubtitleEdit.PluginLogic
             }
         }
 
-        internal void AdjustDisplayTimeUsingSeconds(double seconds, System.Windows.Forms.ListView.SelectedIndexCollection selectedIndexes)
+        public void AdjustDisplayTimeUsingSeconds(double seconds, System.Windows.Forms.ListView.SelectedIndexCollection selectedIndexes)
         {
             for (int i = 0; i < _paragraphs.Count; i++)
             {
                 if (selectedIndexes == null || selectedIndexes.Contains(i))
                 {
-                    double nextStartMilliseconds = _paragraphs[_paragraphs.Count - 1].EndTime.TotalMilliseconds + 100000;
+                    double nextStartMilliseconds = _paragraphs[_paragraphs.Count - 1].EndTime.TotalMilliseconds + TimeCode.BaseUnit;
                     if (i + 1 < _paragraphs.Count)
                         nextStartMilliseconds = _paragraphs[i + 1].StartTime.TotalMilliseconds;
 
-                    double newEndMilliseconds = _paragraphs[i].EndTime.TotalMilliseconds + (seconds * 1000.0);
+                    double newEndMilliseconds = _paragraphs[i].EndTime.TotalMilliseconds + (seconds * TimeCode.BaseUnit);
                     if (newEndMilliseconds > nextStartMilliseconds)
                         newEndMilliseconds = nextStartMilliseconds - 1;
 
@@ -208,21 +208,15 @@ namespace Nikse.SubtitleEdit.PluginLogic
             }
         }
 
-        internal void Renumber(int startNumber)
+        public void Renumber(int startNumber = 1)
         {
-            int i;
-            if (startNumber < 0)
-                i = 0;
-            else
-                i = startNumber;
             foreach (Paragraph p in _paragraphs)
             {
-                p.Number = i;
-                i++;
+                p.Number = startNumber++;
             }
         }
 
-        internal int GetIndex(Paragraph p)
+        public int GetIndex(Paragraph p)
         {
             if (p == null)
                 return -1;
@@ -246,7 +240,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
             return -1;
         }
 
-        internal Paragraph GetFirstAlike(Paragraph p)
+        public Paragraph GetFirstAlike(Paragraph p)
         {
             foreach (Paragraph item in _paragraphs)
             {
@@ -258,7 +252,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
             return null;
         }
 
-        internal Paragraph GetFirstParagraphByLineNumber(int number)
+        public Paragraph GetFirstParagraphByLineNumber(int number)
         {
             foreach (Paragraph p in _paragraphs)
             {
@@ -268,40 +262,27 @@ namespace Nikse.SubtitleEdit.PluginLogic
             return null;
         }
 
-        internal int RemoveEmptyLines()
+        public int RemoveEmptyLines()
         {
-            int count = 0;
+            int count = _paragraphs.Count;
             if (_paragraphs.Count > 0)
             {
                 int firstNumber = _paragraphs[0].Number;
                 for (int i = _paragraphs.Count - 1; i >= 0; i--)
                 {
                     Paragraph p = _paragraphs[i];
-                    if (string.IsNullOrEmpty(p.Text.Trim()))
+                    if (string.IsNullOrWhiteSpace(p.Text))
                     {
                         _paragraphs.RemoveAt(i);
-                        count++;
                     }
                 }
-                Renumber(firstNumber);
+                if (count != _paragraphs.Count)
+                    Renumber(firstNumber);
             }
-            return count;
+            return count - _paragraphs.Count;
         }
 
-        internal void RemoveLine(int lineNumber)
-        {
-            if (_paragraphs == null)
-                return;
-
-            int startNumber = _paragraphs[0].Number;
-            if (lineNumber >= 0)
-            {
-                _paragraphs.Remove(_paragraphs.Single(p => p.Number == lineNumber));
-            }
-            Renumber(startNumber);
-        }
-
-        internal void InsertParagraphInCorrectTimeOrder(Paragraph newParagraph)
+        public void InsertParagraphInCorrectTimeOrder(Paragraph newParagraph)
         {
             for (int i = 0; i < Paragraphs.Count; i++)
             {

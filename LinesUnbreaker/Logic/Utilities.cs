@@ -66,7 +66,16 @@ namespace Nikse.SubtitleEdit.PluginLogic
 
             if (string.IsNullOrEmpty(s) || !s.Contains('<'))
                 return s;
-            s = Regex.Replace(s, "(?i)</?[iіbu]>", string.Empty);
+            //s = Regex.Replace(s, "(?i)</?[iіbu]>", string.Empty);
+            var idx = s.IndexOf('<');
+            while (idx >= 0)
+            {
+                var endIdx = s.IndexOf('>', idx);
+                if (endIdx < idx)
+                    break;
+                s = s.Remove(idx, endIdx - idx + 1);
+                idx = s.IndexOf('<', idx);
+            }
             return RemoveHtmlFontTag(s).Trim();
         }
 
