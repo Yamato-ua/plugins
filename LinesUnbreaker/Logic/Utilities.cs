@@ -130,5 +130,19 @@ namespace Nikse.SubtitleEdit.PluginLogic
             }
             return singleLine;
         }
+
+        public static int GetNumberOfLines(string text)
+        {
+            if (text == null || text.Length == 0)
+                return 0;
+            var totalLines = 1;
+            var idx = text.IndexOf('\n');
+            while (idx > 0)
+            {
+                totalLines++;
+                idx = text.IndexOf('\n', idx + 1);
+            }
+            return totalLines;
+        }
     }
 }

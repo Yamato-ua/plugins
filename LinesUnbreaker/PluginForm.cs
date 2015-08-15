@@ -226,7 +226,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
         {
             _allowFixes = true;
             FindLines();
-            FixedSubtitle = _subtitle.ToText(new SubRip());
+            FixedSubtitle = _subtitle.ToText();
             DialogResult = DialogResult.OK;
         }
 
@@ -242,10 +242,10 @@ namespace Nikse.SubtitleEdit.PluginLogic
                 return;
             listView1.BeginUpdate();
             if (sender == buttonCheckAll)
-                foreach (ListViewItem item in this.listView1.Items)
+                foreach (ListViewItem item in listView1.Items)
                     item.Checked = true;
             else
-                foreach (ListViewItem item in this.listView1.Items)
+                foreach (ListViewItem item in listView1.Items)
                     item.Checked = !item.Checked;
             listView1.EndUpdate();
         }

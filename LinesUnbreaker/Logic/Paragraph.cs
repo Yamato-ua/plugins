@@ -8,15 +8,15 @@ namespace Nikse.SubtitleEdit.PluginLogic
         public string Text { get; set; }
         public TimeCode StartTime { get; set; }
         public TimeCode EndTime { get; set; }
+
         public TimeCode Duration
         {
             get
             {
-                var timeCode = new TimeCode(EndTime.TimeSpan);
-                timeCode.AddTime(-StartTime.TotalMilliseconds);
-                return timeCode;
+                return new TimeCode(EndTime.TotalMilliseconds - StartTime.TotalMilliseconds);
             }
         }
+
         public int StartFrame { get; set; }
         public int EndFrame { get; set; }
         public bool Forced { get; set; }
@@ -63,8 +63,8 @@ namespace Nikse.SubtitleEdit.PluginLogic
 
         public Paragraph(string text, double startTotalMilliseconds, double endTotalMilliseconds)
         {
-            StartTime = new TimeCode(TimeSpan.FromMilliseconds(startTotalMilliseconds));
-            EndTime = new TimeCode(TimeSpan.FromMilliseconds(endTotalMilliseconds));
+            StartTime = new TimeCode(startTotalMilliseconds);
+            EndTime = new TimeCode(endTotalMilliseconds);
             Text = text;
         }
 
@@ -100,9 +100,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
         {
             get
             {
-                if (string.IsNullOrEmpty(Text))
-                    return 0;
-                return Text.Length - Text.Replace(Environment.NewLine, string.Empty).Length;
+                return Utilities.GetNumberOfLines(Text);
             }
         }
 

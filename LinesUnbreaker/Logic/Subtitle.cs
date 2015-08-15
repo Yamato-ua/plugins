@@ -8,7 +8,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
     internal class Subtitle
     {
         private List<Paragraph> _paragraphs;
-        private SubtitleFormat _format;
+        private readonly SubtitleFormat SubFormat;
         private bool _wasLoadedWithFrameNumbers;
         public string Header { get; set; }
         public string Footer { get; set; }
@@ -20,7 +20,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
         {
             get
             {
-                return _format;
+                return SubFormat;
             }
         }
 
@@ -28,6 +28,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
         {
             _paragraphs = new List<Paragraph>();
             FileName = "Untitled";
+            SubFormat = new SubRip();
             //_format = new SubRip();
         }
 
@@ -60,9 +61,9 @@ namespace Nikse.SubtitleEdit.PluginLogic
             return _paragraphs[index];
         }
 
-        public string ToText(SubtitleFormat format)
+        public string ToText()
         {
-            return format.ToText(this, Path.GetFileNameWithoutExtension(FileName));
+            return SubFormat.ToText(this, Path.GetFileNameWithoutExtension(FileName));
         }
 
         public void AddTimeToAllParagraphs(TimeSpan time)
@@ -81,10 +82,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
         /// <returns>True if times could be calculated</returns>
         public bool CalculateTimeCodesFromFrameNumbers(double frameRate)
         {
-            if (_format == null)
-                return false;
-
-            if (_format.IsTimeBased)
+            if (SubFormat == null || SubFormat.IsTimeBased)
                 return false;
 
             foreach (Paragraph p in Paragraphs)
@@ -101,10 +99,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
         /// <returns></returns>
         public bool CalculateFrameNumbersFromTimeCodes(double frameRate)
         {
-            if (_format == null)
-                return false;
-
-            if (_format.IsFrameBased)
+            if (SubFormat == null || SubFormat.IsFrameBased)
                 return false;
 
             foreach (Paragraph p in Paragraphs)
