@@ -31,9 +31,9 @@
             this.listView1 = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonOK = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -83,6 +83,11 @@
             this.columnHeader2.Text = "Line#";
             this.columnHeader2.Width = 52;
             // 
+            // columnHeader5
+            // 
+            this.columnHeader5.Text = "Length";
+            this.columnHeader5.Width = 45;
+            // 
             // columnHeader3
             // 
             this.columnHeader3.Text = "Before";
@@ -92,11 +97,6 @@
             // 
             this.columnHeader4.Text = "After";
             this.columnHeader4.Width = 350;
-            // 
-            // columnHeader5
-            // 
-            this.columnHeader5.Text = "Length";
-            this.columnHeader5.Width = 45;
             // 
             // buttonCancel
             // 
@@ -206,6 +206,7 @@
             0,
             0,
             0});
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // buttonCheckAll
             // 

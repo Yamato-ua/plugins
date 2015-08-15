@@ -9,6 +9,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
 {
     internal partial class PluginForm : Form
     {
+        private readonly Timer _timer = new Timer();
         public string FixedSubtitle { get; set; }
         //private string path = Path.Combine("Plugins", "SeLinesUnbreaker.xml");
         private Subtitle _subtitle;
@@ -37,6 +38,15 @@ namespace Nikse.SubtitleEdit.PluginLogic
             {
                 LoadSettingsIfThereIs(false); // the setting will be stored in xml file.
             };
+
+
+            _timer.Interval = 2000;
+            _timer.Tick += delegate
+            {
+                buttonUpdate_Click(null, EventArgs.Empty);
+                _timer.Stop();
+            };
+
             LoadSettingsIfThereIs(true);
             FindLines();
         }
@@ -250,6 +260,14 @@ namespace Nikse.SubtitleEdit.PluginLogic
             var half = (listView1.Width - totalWidth) >> 1;
             listView1.Columns[3].Width = half;
             listView1.Columns[4].Width = half;
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            if (!_timer.Enabled)
+            {
+                _timer.Start();
+            }
         }
     }
 }
