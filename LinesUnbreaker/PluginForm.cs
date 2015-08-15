@@ -93,8 +93,8 @@ namespace Nikse.SubtitleEdit.PluginLogic
         private string GetSettingsFileName()
         {
             // "C:\Users\Ivandrofly\Desktop\SubtitleEdit\Plugins\SeLinesUnbreaker.xml"
-            string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
-            if (path.StartsWith("file:\\"))
+            var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
+            if (path.StartsWith("file:\\", StringComparison.Ordinal))
                 path = path.Remove(0, 6);
             path = Path.Combine(path, "Plugins");
             if (!Directory.Exists(path))
@@ -164,9 +164,9 @@ namespace Nikse.SubtitleEdit.PluginLogic
         {
             var item = new ListViewItem() { Checked = true, UseItemStyleForSubItems = true, Tag = p };
             item.SubItems.Add(p.Number.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            item.SubItems.Add(lineLength);
             item.SubItems.Add(before.Replace(Environment.NewLine, Configuration.ListViewLineSeparatorString));
             item.SubItems.Add(after.Replace(Environment.NewLine, Configuration.ListViewLineSeparatorString));
-            item.SubItems.Add(lineLength);
             listView1.Items.Add(item);
         }
 
@@ -223,7 +223,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
         private void PluginForm_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
-                DialogResult = System.Windows.Forms.DialogResult.Cancel;
+                DialogResult = DialogResult.Cancel;
         }
 
         private void SelectionHandler(object sender, EventArgs e)
