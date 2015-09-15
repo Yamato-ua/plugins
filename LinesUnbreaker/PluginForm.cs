@@ -48,7 +48,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
             };
 
             LoadSettingsIfThereIs(true);
-            FindLines();
+            GeneratePreview();
         }
 
         private void LoadSettingsIfThereIs(bool load)
@@ -112,7 +112,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
             return Path.Combine(path, "SeLinesUnbreaker.xml");
         }
 
-        private void FindLines()
+        private void GeneratePreview()
         {
             _totalFixed = 0;
             listView1.BeginUpdate();
@@ -121,8 +121,8 @@ namespace Nikse.SubtitleEdit.PluginLogic
             {
                 if (p.NumberOfLines < 2)
                     continue;
-                string oldText = p.Text;
-                string text = p.Text;
+                var oldText = p.Text;
+                var text = oldText;
 
                 text = UnbreakLines(text);
                 if (text != oldText)
@@ -187,15 +187,15 @@ namespace Nikse.SubtitleEdit.PluginLogic
             temp = temp.Replace("  ", " ").Trim();
 
             // TODO: move these methods in Utilities's helper method
-            if ((temp.StartsWith('-') || temp.Contains("\r\n-")) && checkBoxSkipDialog.Checked)
+            if (checkBoxSkipDialog.Checked && (temp.StartsWith('-') || temp.Contains("\r\n-")))
             {
                 return s;
             }
-            if ((temp.Contains('[') || temp.Contains('(')) && checkBoxMoods.Checked)
+            if (checkBoxMoods.Checked && (temp.Contains('[') || temp.Contains('(')))
             {
                 return s;
             }
-            if (Regex.IsMatch(temp, ":\\B") && checkBoxSkipNarrator.Checked)
+            if (checkBoxSkipNarrator.Checked && Regex.IsMatch(temp, ":\\B"))
             {
                 return s;
             }
@@ -213,7 +213,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
             listView1.Items.Clear();
             _totalFixed = 0;
             buttonUpdate.Enabled = false;
-            FindLines();
+            GeneratePreview();
             buttonUpdate.Enabled = true;
         }
 
@@ -225,8 +225,9 @@ namespace Nikse.SubtitleEdit.PluginLogic
         private void buttonOK_Click(object sender, EventArgs e)
         {
             _allowFixes = true;
-            FindLines();
+            GeneratePreview();
             FixedSubtitle = _subtitle.ToText();
+            File.WriteAllText("d:\\sub.srt", FixedSubtitle);
             DialogResult = DialogResult.OK;
         }
 

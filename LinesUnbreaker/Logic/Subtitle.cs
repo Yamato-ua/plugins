@@ -8,7 +8,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
     internal class Subtitle
     {
         private List<Paragraph> _paragraphs;
-        private readonly SubtitleFormat SubFormat;
+        private readonly SubtitleFormat SubFormat = new SubRip();
         private bool _wasLoadedWithFrameNumbers;
         public string Header { get; set; }
         public string Footer { get; set; }

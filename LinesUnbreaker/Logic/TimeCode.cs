@@ -156,5 +156,15 @@ namespace Nikse.SubtitleEdit.PluginLogic
             _totalMilliseconds += milliseconds;
         }
 
+        public override string ToString()
+        {
+            var ts = TimeSpan;
+            string s = string.Format("{0:00}:{1:00}:{2:00},{3:000}", ts.Hours + ts.Days * 24, ts.Minutes, ts.Seconds, ts.Milliseconds);
+
+            if (TotalMilliseconds >= 0)
+                return s;
+            return "-" + s.Replace("-", string.Empty);
+        }
+
     }
 }

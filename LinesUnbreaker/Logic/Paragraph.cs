@@ -91,9 +91,7 @@ namespace Nikse.SubtitleEdit.PluginLogic
 
         public override string ToString()
         {
-            const string format = "{0}\r\n{1} --> {2}\r\n{3}";
-            return string.Format(format, Number, StartTime, EndTime, Text);
-            //return StartTime + " --> " + EndTime + " " + Text;
+            return string.Format("{0}\r\n{1} --> {2}\r\n{3}", Number, StartTime, EndTime, Text);
         }
 
         public int NumberOfLines
